@@ -1,7 +1,10 @@
 
+import static java.awt.SystemColor.text;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -10,6 +13,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -18,7 +22,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -120,33 +126,37 @@ public class Notepad extends Application {
         Save.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                Alert alert = new Alert(AlertType.INFORMATION);
-                alert.setTitle("Save Dialog");
-                alert.setContentText("sure?");
-                alert.showAndWait();
                 FileChooser fc = new FileChooser();
-                FileChooser.ExtensionFilter ext = new FileChooser.ExtensionFilter("txt files", ".txt");
-                File saveFile = fc.showSaveDialog(null);
+                FileChooser.ExtensionFilter ext = new FileChooser.ExtensionFilter("txt files", "*.txt");
+                File savedFile = fc.showSaveDialog(null);
                 try {
-                    FileWriter fw = new FileWriter(saveFile);
+                    FileWriter fw = new FileWriter(savedFile);
                     fw.write(txtarea.getText());
                     fw.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(Notepad.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
                 }
             }
-
         });
-        about.setOnAction(new EventHandler<ActionEvent>() {
+        Open.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                Alert alert = new Alert(AlertType.INFORMATION);
-                alert.setTitle("Info About Notepad");
-                alert.setContentText("Notepad is a textdeiotr to edit and compile programmin languages");
-                alert.showAndWait();
+                try {
+                    FileChooser fc = new FileChooser();
+                    FileChooser.ExtensionFilter ext = new FileChooser.ExtensionFilter("txt files", "*.txt");
+                    File opened_file = fc.showOpenDialog(null);
+                    Scanner scan = new Scanner(opened_file);
+                    String fileContent = "";
+                    while (scan.hasNext()) {
+                        txtarea.appendText(scan.nextLine() + '\n');
+//                          fileContent = fileContent.concat(scan.nextLine()+"\n");
+                    }
+                    scan.close();
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
             }
         });
-
         pane = new BorderPane();
         pane.setTop(menuebar);
         pane.setCenter(txtarea);
